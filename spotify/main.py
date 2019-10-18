@@ -11,7 +11,7 @@ conn = mysql_setup()
 
 def str_to_timestamp_parser(texto):
     texto = texto[0:10]
-    return datetime.datetime.strptime(texto, "%Y-%m-%d").timestamp()
+    return time.mktime(datetime.datetime.strptime(texto, "%Y-%m-%d").timetuple())
 
 def genre_insert(genre_list):
     for genre in genre_list:
@@ -19,7 +19,7 @@ def genre_insert(genre_list):
             try:
                 cursor.execute("INSERT INTO Genre (genre_name) VALUES (%s)", (genre))
             except pymysql.err.IntegrityError as e:
-                print("Erro: não foi possivel adicionar o gênero\n{}\n".format(e))
+                print("Erro: não foi possivel adicionar o gênero '{}'\n{}\n".format(genre, e))
                 pass
 
 
@@ -51,7 +51,7 @@ def artist_loop(artist_list):
                 cursor.execute("INSERT INTO Artist (id_artist, artist_name, popularity, followers) "
                 "VALUES (%s, %s, %s, %s)", (artist_id, name, popularity, followers))
             except pymysql.err.IntegrityError as e:
-                print("Erro: não foi possivel adicionar o artista\n{}\n".format(e))
+                print("Erro: não foi possivel adicionar o artista '{}'\n{}\n".format(name, e))
         
         for genre in artist["genres"]:
             with conn.cursor() as cursor:
@@ -119,7 +119,6 @@ def track_loop(id_track):
     energy = track_features["energy"]
     key_note = track_features["key"]
     loudness = track_features["loudness"]
-    print(loudness)
     mode = track_features["mode"]
     speechiness = track_features["speechiness"]
     acousticness = track_features["acousticness"]
@@ -140,7 +139,7 @@ def track_loop(id_track):
                             energy, key_note, loudness, mode, speechiness, acousticness, instrumentalness, \
                             liveness, valence, tempo, time_signature))
         except pymysql.err.IntegrityError as e:
-            print("Erro: não foi possivel dar adicionar a track\n{}\n".format(e))
+            print("Erro: não foi possivel dar adicionar a track '{}'\n{}\n".format(track_name, e))
             pass
 
     artists_id = artist_loop(track_artists)
@@ -166,7 +165,8 @@ def track_loop(id_track):
     del album["images"]
     album_name = album["name"]
     album_popularity = album["popularity"]
-    album_release_date = str_to_timestamp_parser(album["release_date"])
+    album_release_date = album["release_date"] #+ " 00:00:01"
+    album_release_date = album_release_date.replace("'", "")
     del album["release_date_precision"]
     album_ntracks = album["total_tracks"]
     album_tracks = album["tracks"]["items"]
@@ -178,11 +178,12 @@ def track_loop(id_track):
 
     with conn.cursor() as cursor:
         try:
-            cursor.execute("INSERT INTO Album (id_album, album_name, release_date, popularity, album_ntracks) "
-                            "VALUES (%s, %s, %s, %s, %s)",
+            print(album_name)
+            cursor.execute("INSERT INTO Album (id_album, album_name, release_date, popularity, ntracks) "
+                            "VALUES (%s, %s, STR_TO_DATE(%s, '%%Y-%%m-%%d'), %s, %s)",
                             (album_id, album_name, album_release_date, album_popularity, album_ntracks))
         except pymysql.err.IntegrityError as e:
-            print("Erro: não foi possivel dar adicionar o album\n{}\n".format(e))
+            print("Erro: não foi possivel dar adicionar o album '{}'\n{}\n".format(album_name, e))
             pass
     
     album_artists_id = artist_loop(album_artists)
@@ -251,7 +252,7 @@ def user_loop(user_id):
             cursor.execute("INSERT INTO Usuario (id_user, display_name, followers) VALUES (%s, %s, %s)",
                             (user["id"], user["display_name"], user["followers"]))
         except pymysql.err.IntegrityError as e:
-            print("Erro: não foi possivel dar adicionar o usuario\n{}\n".format(e))
+            print("Erro: não foi possivel dar adicionar o usuario '{}'\n{}\n".format(user["display_name"], e))
             pass
 
     playlist_return = playlist_loop(user_id)
@@ -267,7 +268,7 @@ def user_loop(user_id):
                     cursor.execute("INSERT INTO Playlist_Track (id_playlist, id_track) VALUES (%s, %s)",
                                     (playlist_return[0][i], playlist_track["track"]["id"]))
                 except pymysql.err.IntegrityError as e:
-                    print("Erro: não foi possivel dar adicionar a playlist\n{}\n".format(e))
+                    print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                     pass
 
 '''
@@ -280,9 +281,11 @@ def main():
     print("")
     with conn.cursor() as cursor:
         cursor.execute('START TRANSACTION')
-    user_loop("22cibcwsgccqgovymihtk5v7y")
+    user_loop("22cibcwsgccqgovymihtk5v7y") #liu
+    #user_loop("31rkh7kc52ktphhx6pdnidpcf2he") #joao gindro
+    #user_loop("lucasvaz97") #tarraf
     with conn.cursor() as cursor:
-            cursor.execute('COMMIT')
+        cursor.execute('COMMIT')
 
 
 if __name__ == '__main__':
