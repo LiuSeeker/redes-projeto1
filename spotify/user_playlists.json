@@ -1,0 +1,18 @@
+{
+    "collaborative": false,
+    "id": "4LAe6LdE6xlKOW1KlESeaA",
+    "images": [
+        {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2733558ef8ef5e148a809900566",
+            "width": 640
+        }
+    ],
+    "public": true,
+    "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/4LAe6LdE6xlKOW1KlESeaA/tracks",
+        "total": 3
+    },
+    "owner_id": "22cibcwsgccqgovymihtk5v7y",
+    "playlist_name": "HZ"
+}

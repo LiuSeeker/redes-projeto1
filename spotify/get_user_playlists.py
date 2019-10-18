@@ -2,23 +2,25 @@ import json
 from pprint import pprint
 from setup import api_setup
 
-def get_user_playlists(user_id):
-    api = api_setup()
+#def get_user_playlists(user_id):
+api = api_setup()
 
-    user_playlists = api.user_playlists(user_id)
+user_playlists = api.user_playlists("22cibcwsgccqgovymihtk5v7y")
 
-    for playlist in user_playlists["items"]:
-        del playlist["external_urls"]
-        del playlist["href"]
-        playlist["images"] = playlist["images"][0]["url"]
-        playlist["owner"] = playlist["owner"]["id"]
-        playlist["owner_id"] = playlist.pop("owner")
-        playlist["image"] = playlist.pop("images")
-        del playlist["primary_color"]
-        del playlist["snapshot_id"]
-        playlist["playlist_name"] = playlist.pop("name")
-        del playlist["type"]
-        del playlist["uri"]
-        playlist["id_playlist"] = playlist.pop("id")
+for playlist in user_playlists["items"]:
+    del playlist["external_urls"]
+    del playlist["href"]
+    #playlist["images"] = playlist["images"][0]["url"]
+    #playlist["image"] = playlist.pop("images")
+    playlist["owner"] = playlist["owner"]["id"]
+    playlist["owner_id"] = playlist.pop("owner")
+    del playlist["primary_color"]
+    del playlist["snapshot_id"]
+    playlist["playlist_name"] = playlist.pop("name")
+    del playlist["type"]
+    del playlist["uri"]
 
-    return 
+#pprint(user_playlists["items"][0])
+with open("user_playlists.json", "w+") as fp:
+    json.dump(user_playlists["items"][0], fp, indent=4)
+    #return user_playlists
