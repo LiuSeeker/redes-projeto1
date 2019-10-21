@@ -176,7 +176,6 @@ def track_loop(id_track):
 
     with conn.cursor() as cursor:
         try:
-            print(album_name)
             cursor.execute("INSERT INTO Album (id_album, album_name, release_date, popularity, ntracks) "
                             "VALUES (%s, %s, STR_TO_DATE(%s, '%%Y-%%m-%%d'), %s, %s)",
                             (album_id, album_name, album_release_date, album_popularity, album_ntracks))
@@ -268,7 +267,8 @@ def main():
     with conn.cursor() as cursor:
         #cursor.execute('START TRANSACTION')
         cursor.execute("SET autocommit=1")
-    genres = ["rock"] #, "pop", "jazz", "classic", "hip hop"]
+    genres = ["hip hop"]
+    #genres = ["rock", "pop", "jazz", "classic", "hip hop"]
     for genre in genres:    
         playlist_find(genre)
 

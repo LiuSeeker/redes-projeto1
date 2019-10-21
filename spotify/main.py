@@ -178,7 +178,6 @@ def track_loop(id_track):
 
     with conn.cursor() as cursor:
         try:
-            print(album_name)
             cursor.execute("INSERT INTO Album (id_album, album_name, release_date, popularity, ntracks) "
                             "VALUES (%s, %s, STR_TO_DATE(%s, '%%Y-%%m-%%d'), %s, %s)",
                             (album_id, album_name, album_release_date, album_popularity, album_ntracks))
@@ -279,13 +278,15 @@ with open("track.json", "w+") as fp:
 
 def main():
     print("")
+    #with conn.cursor() as cursor:
+    #    cursor.execute('START TRANSACTION')
     with conn.cursor() as cursor:
-        cursor.execute('START TRANSACTION')
+        cursor.execute('SET autocommit=1')
     user_loop("22cibcwsgccqgovymihtk5v7y") #liu
     #user_loop("31rkh7kc52ktphhx6pdnidpcf2he") #joao gindro
     #user_loop("lucasvaz97") #tarraf
-    with conn.cursor() as cursor:
-        cursor.execute('COMMIT')
+    #with conn.cursor() as cursor:
+    #    cursor.execute('COMMIT')
 
 
 if __name__ == '__main__':

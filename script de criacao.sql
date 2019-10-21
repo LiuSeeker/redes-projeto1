@@ -44,7 +44,7 @@ PRIMARY KEY (id_artist, genre_name)
 DROP TABLE IF EXISTS Track;
 CREATE TABLE Track(
 id_track VARCHAR(64) NOT NULL PRIMARY KEY,
-track_name VARCHAR(64) NOT NULL,
+track_name TEXT(1024) NOT NULL,
 duration_ms INT NOT NULL,
 popularity INT NOT NULL,
 explicity BOOLEAN NOT NULL,
