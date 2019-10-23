@@ -13,6 +13,7 @@ def str_to_timestamp_parser(texto):
     texto = texto[0:10]
     return time.mktime(datetime.datetime.strptime(texto, "%Y-%m-%d").timetuple())
 
+
 def genre_insert(genre_list):
     for genre in genre_list:
         with conn.cursor() as cursor:
@@ -52,6 +53,7 @@ def artist_loop(artist_list):
                 "VALUES (%s, %s, %s, %s)", (artist_id, name, popularity, followers))
             except pymysql.err.IntegrityError as e:
                 print("Erro: não foi possivel adicionar o artista '{}'\n{}\n".format(name, e))
+                return artists_id
         
         for genre in artist["genres"]:
             with conn.cursor() as cursor:
@@ -67,8 +69,7 @@ def artist_loop(artist_list):
 def track_loop(id_track):
     with conn.cursor() as cursor:
         try:
-            cursor.execute("SELECT * FROM Track WHERE id_track = %s",
-                            (id_track))
+            cursor.execute("SELECT * FROM Track WHERE id_track = %s", (id_track))
             select_track_id = cursor.fetchone()
             if select_track_id:
                 return 0
@@ -194,10 +195,11 @@ def track_loop(id_track):
                 print("Erro: não foi possivel dar adicionar o album do artista\n{}\n".format(e))
                 pass
 
-
+    '''
     album_tracks = api.album_tracks(album_id)
     for track in album_tracks["items"]:
         track_loop(track["id"])
+    '''
         
 def user_loop(user_id):
     user = api.user(user_id)
@@ -247,10 +249,27 @@ def playlist_find(genre):
 
     playlist_return = playlist_loop(genre)
 
+    
+    
+
     for i in range(len(playlist_return[0])):
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute("SELECT * FROM Playlist_Track WHERE id_playlist = %s", (playlist_return[0][i]))
+                tracks = cursor.fetchall()
+            except pymysql.err.IntegrityError as e:
+                print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
+                pass
+        
+        if len(tracks) > 40:
+            continue
+
         playlist_tracks = api._get(playlist_return[1][i]["href"])
         for playlist_track in playlist_tracks["items"]:
-            track_loop(playlist_track["track"]["id"])
+            if playlist_track["track"]:
+                track_loop(playlist_track["track"]["id"])
+            else:
+                continue
             
 
             with conn.cursor() as cursor:
@@ -267,8 +286,8 @@ def main():
     with conn.cursor() as cursor:
         #cursor.execute('START TRANSACTION')
         cursor.execute("SET autocommit=1")
-    genres = ["hip hop"]
-    #genres = ["rock", "pop", "jazz", "classic", "hip hop"]
+    genres = ["eletronic"]
+    #genres = ["rock", "pop", "jazz", "classic", "hip hop", "christian", "eletronic", "classical", "folk", "blues, "punk", "mpb", "sertanejo", "rap", "reggae"]
     for genre in genres:    
         playlist_find(genre)
 
