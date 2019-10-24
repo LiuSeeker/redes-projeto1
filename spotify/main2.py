@@ -1,9 +1,15 @@
-import json
-from pprint import pprint
-from setup import api_setup, mysql_setup
-import time
 import datetime
+import json
+import os
+import time
+from pprint import pprint
+
 import pymysql
+import requests
+import urllib3
+import spotipy
+
+from setup import api_setup, mysql_setup
 
 api = api_setup()
 
@@ -79,7 +85,7 @@ def track_loop(id_track):
 
     track = api.track(id_track)
 
-    album_id = track["album"]["id"]
+    id_album = track["album"]["id"]
     track_artists = track["artists"]
 
     del track["disc_number"]
@@ -102,6 +108,8 @@ def track_loop(id_track):
     duration_ms = track["duration_ms"]
 
     track_features = api.audio_features(id_track)[0]
+    if track_features is None:
+        return
 
     if track_features["mode"] == 0:
         track_features["mode"] == "minor"
@@ -141,6 +149,14 @@ def track_loop(id_track):
             print("Erro: não foi possivel dar adicionar a track '{}'\n{}\n".format(track_name, e))
             pass
 
+    with conn.cursor() as cursor:
+        try:
+            cursor.execute("INSERT INTO Album_Track (id_album, id_track) VALUES (%s, %s)",
+                            (id_album, id_track))
+        except pymysql.err.IntegrityError as e:
+            print("Erro: não foi possivel dar adicionar a track em album")
+            pass
+
     artists_id = artist_loop(track_artists)
 
     for artist_id in artists_id:
@@ -152,7 +168,7 @@ def track_loop(id_track):
                 print("Erro: não foi possivel dar adicionar a track do artista\n{}\n".format(e))
                 pass
 
-    album = api.album(album_id)
+    album = api.album(id_album)
     del album["album_type"]
     album_artists = album["artists"]
     del album["available_markets"]
@@ -179,7 +195,7 @@ def track_loop(id_track):
         try:
             cursor.execute("INSERT INTO Album (id_album, album_name, release_date, popularity, ntracks) "
                             "VALUES (%s, %s, STR_TO_DATE(%s, '%%Y-%%m-%%d'), %s, %s)",
-                            (album_id, album_name, album_release_date, album_popularity, album_ntracks))
+                            (id_album, album_name, album_release_date, album_popularity, album_ntracks))
         except pymysql.err.IntegrityError as e:
             print("Erro: não foi possivel dar adicionar o album '{}'\n{}\n".format(album_name, e))
             pass
@@ -190,7 +206,7 @@ def track_loop(id_track):
         with conn.cursor() as cursor:
             try:
                 cursor.execute("INSERT INTO Artist_Album (id_artist, id_album) VALUES (%s, %s)",
-                                (album_artist_id, album_id))
+                                (album_artist_id, id_album))
             except pymysql.err.IntegrityError as e:
                 print("Erro: não foi possivel dar adicionar o album do artista\n{}\n".format(e))
                 pass
@@ -249,9 +265,6 @@ def playlist_find(genre):
 
     playlist_return = playlist_loop(genre)
 
-    
-    
-
     for i in range(len(playlist_return[0])):
         with conn.cursor() as cursor:
             try:
@@ -261,10 +274,12 @@ def playlist_find(genre):
                 print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                 pass
         
-        if len(tracks) > 40:
-            continue
+        
 
         playlist_tracks = api._get(playlist_return[1][i]["href"])
+        if len(playlist_tracks) > 40:
+            continue
+
         for playlist_track in playlist_tracks["items"]:
             if playlist_track["track"]:
                 track_loop(playlist_track["track"]["id"])
@@ -280,20 +295,43 @@ def playlist_find(genre):
                     print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                     pass
 
+def errorPrint(error):
+    print("\n\n! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !")
+    print(error)
+    print("! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !\n")
 
 def main():
     print("")
+
+    global api, conn
     with conn.cursor() as cursor:
-        #cursor.execute('START TRANSACTION')
         cursor.execute("SET autocommit=1")
-    genres = ["eletronic"]
-    #genres = ["rock", "pop", "jazz", "classic", "hip hop", "christian", "eletronic", "classical", "folk", "blues, "punk", "mpb", "sertanejo", "rap", "reggae"]
-    for genre in genres:    
-        playlist_find(genre)
 
-    #with conn.cursor() as cursor:
-    #    cursor.execute('COMMIT')
-
+    genres = ["rock", "pop", "jazz", "classic", "hip hop", "christian", "eletronic", "classical", "folk", "blues", "punk", "mpb", "sertanejo", "rap", "reggae"]
+    i = 0
+    while i < len(genres):
+        try:
+            playlist_find(genres[i])
+            i += 1
+        except (OSError, requests.exceptions.ConnectionError, urllib3.exceptions.ProtocolError) as e:
+            errorPrint(e)
+            print("Restantando o programa e a conexao do spotify\n")
+            api = api_setup()
+            continue
+        except pymysql.err.OperationalError as e:
+            errorPrint(e)
+            print("Restantando o programa e a conexao do mysql\n")
+            conn = mysql_setup()
+            continue
+        except TypeError as e:
+            errorPrint(e)
+            print("Restantando o programa\n ")
+            continue
+        except (spotipy.client.SpotifyException) as e:
+            errorPrint(e)
+            print("Restantando o programa e a conexao do spotify\n")
+            api = api_setup()
+            continue
 
 if __name__ == '__main__':
     main()

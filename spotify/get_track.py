@@ -17,7 +17,7 @@ api = api_setup()
 track = api.track("https://api.spotify.com/v1/track/4tmwiN9YU7xMjh2hoqcVuI")
 
 print("")
-pprint(track["name"])
+pprint(track["album"])
 print("")
 #pprint(playlist_tracks["items"][0]["track"])
 
