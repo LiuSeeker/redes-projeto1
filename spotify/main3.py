@@ -26,7 +26,7 @@ def track_loop(id_track):
             cursor.execute("INSERT INTO Album_Track (id_album, id_track) VALUES (%s, %s)",
                             (id_album, id_track))
         except pymysql.err.IntegrityError as e:
-            print("Erro: não foi possivel dar adicionar a track em album")
+            print("Erro: não foi possivel dar adicionar a track em album: {}".format(e))
             pass
 
 def errorPrint(error):

@@ -79,9 +79,9 @@ def track_loop(id_track):
             select_track_id = cursor.fetchone()
             if select_track_id:
                 return 0
-        except pymysql.err.IntegrityError as e:
+        except (pymysql.err.IntegrityError, pymysql.err.ProgrammingError) as e:
             print("Erro: não foi possivel dar SELECT em Track\n{}\n".format(e))
-            pass
+            return 0
 
     track = api.track(id_track)
 
@@ -238,7 +238,7 @@ def user_loop(user_id):
     return
 
 def playlist_loop(genre):
-    result = api.search(genre, type="playlist", limit=10)
+    result = api.search(genre, type="playlist", limit=50)
     return_tracks = []
     return_playlist_id = []
     
@@ -277,7 +277,7 @@ def playlist_find(genre):
         
 
         playlist_tracks = api._get(playlist_return[1][i]["href"])
-        if len(playlist_tracks) > 40:
+        if len(playlist_tracks) > 50:
             continue
 
         for playlist_track in playlist_tracks["items"]:
@@ -307,7 +307,7 @@ def main():
     with conn.cursor() as cursor:
         cursor.execute("SET autocommit=1")
 
-    genres = ["rock", "pop", "jazz", "classic", "hip hop", "christian", "eletronic", "classical", "folk", "blues", "punk", "mpb", "sertanejo", "rap", "reggae"]
+    genres = ["top 50s", "top 60s", "top 70s", "top 80s", "top 90s", "top 00s", "top 10s"]
     i = 0
     while i < len(genres):
         try:
