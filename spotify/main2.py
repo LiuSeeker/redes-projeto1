@@ -237,8 +237,11 @@ def user_loop(user_id):
     
     return
 
-def playlist_loop(genre):
-    result = api.search(genre, type="playlist", limit=50)
+def playlist_loop(result):
+    
+    if result is None:
+        return None
+
     return_tracks = []
     return_playlist_id = []
     
@@ -263,7 +266,10 @@ def playlist_loop(genre):
 
 def playlist_find(genre):
 
-    playlist_return = playlist_loop(genre)
+    result = api.search(genre, type="playlist", limit=50)
+    if result is None:
+        return
+    playlist_return = playlist_loop(result)
 
     for i in range(len(playlist_return[0])):
         with conn.cursor() as cursor:
@@ -294,6 +300,9 @@ def playlist_find(genre):
                 except pymysql.err.IntegrityError as e:
                     print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                     pass
+
+    
+    playlist_find
 
 def errorPrint(error):
     print("\n\n! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !")

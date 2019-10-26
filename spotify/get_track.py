@@ -15,7 +15,7 @@ def str_to_timestamp_parser(texto):
 api = api_setup()
 
 #track = api.track("https://api.spotify.com/v1/track/4tmwiN9YU7xMjh2hoqcVuI")
-track = api.search("top 50s")
+search = api.search("top 50s", limit=50)
 print("")
 #pprint(track["album"])
 print("")
@@ -23,9 +23,13 @@ print("")
 
 #track_features = api.audio_features(7HB2Waepqi7Ht68ZLKV2C0)
 
-with open("track.json", "w+") as fp:
-    json.dump(track, fp, indent=4)
+nexte = api._get(search["tracks"]["next"])
+next2 = api._get(nexte["tracks"]["next"])
+next3 = api._get(next2["tracks"]["next"])
+next4 = api._get(next3["tracks"]["next"])
 
+with open("nexte.json", "w+") as fp:
+    json.dump(next4, fp, indent=4)
 #times = str_to_timestamp_parser(playlist_tracks["items"][0]["added_at"])
 #print(times, type(times))
 print("")
