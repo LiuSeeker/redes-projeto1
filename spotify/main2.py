@@ -264,9 +264,7 @@ def playlist_loop(result):
     return (return_playlist_id, return_tracks)
 
 
-def playlist_find(genre):
-
-    result = api.search(genre, type="playlist", limit=50)
+def playlist_find(result):
     if result is None:
         return
     playlist_return = playlist_loop(result)
@@ -302,7 +300,7 @@ def playlist_find(genre):
                     pass
 
     
-    playlist_find
+    playlist_find(playlist_return["tracks"]["next"])
 
 def errorPrint(error):
     print("\n\n! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !")
@@ -320,7 +318,8 @@ def main():
     i = 0
     while i < len(genres):
         try:
-            playlist_find(genres[i])
+            result = api.search(genres[i], type="playlist", limit=50)
+            playlist_find(result)
             i += 1
         except (OSError, requests.exceptions.ConnectionError, urllib3.exceptions.ProtocolError) as e:
             errorPrint(e)
