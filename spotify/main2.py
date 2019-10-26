@@ -43,7 +43,7 @@ def artist_loop(artist_list):
         del artist["external_urls"]
         artist["followers"] = artist["followers"]["total"]
         genre_insert(artist["genres"])
-        
+
         #del artist["genres"]
         del artist["href"]
         del artist["images"]
@@ -60,7 +60,7 @@ def artist_loop(artist_list):
             except pymysql.err.IntegrityError as e:
                 print("Erro: não foi possivel adicionar o artista '{}'\n{}\n".format(name, e))
                 return artists_id
-        
+
         for genre in artist["genres"]:
             with conn.cursor() as cursor:
                 try:
@@ -189,7 +189,7 @@ def track_loop(id_track):
     del album["uri"]
 
     genre_insert(album_genres)
-    
+
 
     with conn.cursor() as cursor:
         try:
@@ -199,7 +199,7 @@ def track_loop(id_track):
         except pymysql.err.IntegrityError as e:
             print("Erro: não foi possivel dar adicionar o album '{}'\n{}\n".format(album_name, e))
             pass
-    
+
     album_artists_id = artist_loop(album_artists)
 
     for album_artist_id in album_artists_id:
@@ -216,7 +216,7 @@ def track_loop(id_track):
     for track in album_tracks["items"]:
         track_loop(track["id"])
     '''
-        
+
 def user_loop(user_id):
     user = api.user(user_id)
 
@@ -234,17 +234,14 @@ def user_loop(user_id):
         except pymysql.err.IntegrityError as e:
             print("Erro: não foi possivel dar adicionar o usuario '{}'\n{}\n".format(user["display_name"], e))
             pass
-    
+
     return
 
 def playlist_loop(result):
-    
-    if result is None:
-        return None
 
     return_tracks = []
     return_playlist_id = []
-    
+
     for pl in result["playlists"]["items"]:
         #pprint(pl)
         user_loop(pl["owner"]["id"])
@@ -265,6 +262,7 @@ def playlist_loop(result):
 
 
 def playlist_find(result):
+    #pprint(result)
     if result is None:
         return
     playlist_return = playlist_loop(result)
@@ -277,8 +275,8 @@ def playlist_find(result):
             except pymysql.err.IntegrityError as e:
                 print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                 pass
-        
-        
+
+
 
         playlist_tracks = api._get(playlist_return[1][i]["href"])
         if len(playlist_tracks) > 50:
@@ -289,7 +287,7 @@ def playlist_find(result):
                 track_loop(playlist_track["track"]["id"])
             else:
                 continue
-            
+
 
             with conn.cursor() as cursor:
                 try:
@@ -299,8 +297,10 @@ def playlist_find(result):
                     print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                     pass
 
-    
-    playlist_find(playlist_return["tracks"]["next"])
+    next_result = result["playlists"]["next"]
+    if next_result is None:
+        return
+    playlist_find(api._get(next_result))
 
 def errorPrint(error):
     print("\n\n! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !")
