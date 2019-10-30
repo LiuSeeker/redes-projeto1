@@ -298,8 +298,9 @@ def playlist_find(result):
                     pass
 
     next_result = api._get(result["playlists"]["next"])
-    pprint(next_result)
-    playlist_find(next_result)
+    if next_result is None:
+	return
+    playlist_find(api._get(next_result))
 
 def errorPrint(error):
     print("\n\n! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !")
