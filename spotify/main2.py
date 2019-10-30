@@ -298,8 +298,9 @@ def playlist_find(result):
                     pass
 
     next_result = api._get(result["playlists"]["next"])
+    pprint(result["playlists"]["next"])
     if next_result is None:
-	return
+	    return
     playlist_find(api._get(next_result))
 
 def errorPrint(error):
@@ -314,7 +315,7 @@ def main():
     with conn.cursor() as cursor:
         cursor.execute("SET autocommit=1")
 
-    genres = ["top 50s", "top 60s", "top 70s", "top 80s", "top 90s", "top 00s", "top 10s"]
+    genres = ["a", "e", "i", "o", "u"]
     i = 0
     while i < len(genres):
         try:
