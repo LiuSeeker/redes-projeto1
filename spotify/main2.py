@@ -299,8 +299,9 @@ def playlist_find(result):
                     print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                     pass
 
-    
-    playlist_find(playlist_return["tracks"]["next"])
+    next_result = api._get(result["playlists"]["next"])
+    pprint(next_result)
+    playlist_find(next_result)
 
 def errorPrint(error):
     print("\n\n! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !")
