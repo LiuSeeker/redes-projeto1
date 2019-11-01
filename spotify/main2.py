@@ -315,7 +315,7 @@ def main():
     with conn.cursor() as cursor:
         cursor.execute("SET autocommit=1")
 
-    genres = ["a", "e", "i", "o", "u"]
+    genres = ["e", "i", "o", "u"]
     i = 0
     while i < len(genres):
         try:
