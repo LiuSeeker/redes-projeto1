@@ -74,15 +74,29 @@ def artist_loop(artist_list):
 
 
 def track_loop(id_track, keyword):
+    flag = 0
     with conn.cursor() as cursor:
         try:
             cursor.execute("SELECT * FROM Track WHERE id_track = %s", (id_track))
             select_track_id = cursor.fetchone()
             if select_track_id:
-                return 0
+                flag = 1
         except (pymysql.err.IntegrityError, pymysql.err.ProgrammingError) as e:
             print("Erro: não foi possivel dar SELECT em Track\n{}\n".format(e))
             return 0
+
+
+    with conn.cursor() as cursor:
+        try:
+            cursor.execute("INSERT INTO Track_Tag (id_track, tag_name) VALUES (%s, %s)",
+                            (id_track, keyword))
+        except pymysql.err.IntegrityError as e:
+            print(e)
+            print("Erro: não foi possivel dar adicionar a tag em track")
+            pass
+
+    if flag == 1:
+        return 0
 
     track = api.track(id_track)
 
@@ -156,15 +170,6 @@ def track_loop(id_track, keyword):
                             (id_album, id_track))
         except pymysql.err.IntegrityError as e:
             print("Erro: não foi possivel dar adicionar a track em album")
-            pass
-
-    with conn.cursor() as cursor:
-        try:
-            cursor.execute("INSERT INTO Track_Tag (id_track, tag_name) VALUES (%s, %s)",
-                            (id_track, keyword))
-        except pymysql.err.IntegrityError as e:
-            print(e)
-            print("Erro: não foi possivel dar adicionar a tag em track")
             pass
 
     artists_id = artist_loop(track_artists)
