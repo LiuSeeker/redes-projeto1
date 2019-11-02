@@ -305,10 +305,9 @@ def playlist_find(result, keyword):
                     print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                     pass
 
-    next_result = api._get(result["playlists"]["next"])
-    pprint(next_result)
-    if next_result is None:
+    if result["playlists"]["next"] is None:
 	    return
+    next_result = api._get(result["playlists"]["next"])
     playlist_find(next_result, keyword)
 
 def errorPrint(error):
@@ -323,7 +322,7 @@ def main():
     with conn.cursor() as cursor:
         cursor.execute("SET autocommit=1")
 
-    keywords = ["fifties", "sixties", "seventies", "eighties", "nineties"]
+    keywords = ["sixties", "seventies", "eighties", "nineties"]
     i = 0
     while i < len(keywords):
         with conn.cursor() as cursor:
