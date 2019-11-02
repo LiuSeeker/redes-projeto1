@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS spotifydb;
-CREATE DATABASE spotifydb;
-USE spotifydb;
+DROP DATABASE IF EXISTS spotifydb_v2;
+CREATE DATABASE spotifydb_v2;
+USE spotifydb_v2;
 
 DROP TABLE IF EXISTS Usuario;
 CREATE TABLE Usuario(
@@ -22,6 +22,11 @@ FOREIGN KEY (id_user) REFERENCES Usuario(id_user)
 DROP TABLE IF EXISTS Genre;
 CREATE TABLE Genre(
 genre_name VARCHAR(64) NOT NULL PRIMARY KEY
+);
+
+DROP TABLE IF EXISTS Tag;
+CREATE TABLE Tag(
+tag_name VARCHAR(64) NOT NULL PRIMARY KEY
 );
 
 DROP TABLE IF EXISTS Artist;
@@ -97,3 +102,23 @@ FOREIGN KEY (id_artist) REFERENCES Artist(id_artist),
 FOREIGN KEY (id_album) REFERENCES Album(id_album),
 PRIMARY KEY (id_artist, id_album)
 );
+
+DROP TABLE IF EXISTS Album_Track;
+CREATE TABLE Album_Track(
+id_album VARCHAR(64) NOT NULL,
+id_track VARCHAR(64) NOT NULL,
+FOREIGN KEY (id_album) REFERENCES Album(id_album),
+FOREIGN KEY (id_track) REFERENCES Track(id_track),
+PRIMARY KEY (id_album, id_track)
+);
+
+DROP TABLE IF EXISTS Track_Tag;
+CREATE TABLE Track_Tag(
+id_track VARCHAR(64) NOT NULL,
+tag_name VARCHAR(64) NOT NULL,
+FOREIGN KEY (id_track) REFERENCES Track(id_track),
+FOREIGN KEY (tag_name) REFERENCES Tag(tag_name),
+PRIMARY KEY (id_track, tag_name)
+);
+
+
