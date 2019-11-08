@@ -284,15 +284,18 @@ def playlist_find(result, keyword):
     for i in range(len(playlist_return[0])):
         with conn.cursor() as cursor:
             try:
-                cursor.execute("SELECT * FROM Playlist_Track WHERE id_playlist = %s", (playlist_return[0][i]))
+                cursor.execute("SELECT count(*) FROM Playlist_Track WHERE id_playlist = %s", (playlist_return[0][i]))
+                n_inserted_tracks = cursor.fetchone()
+                
             except pymysql.err.IntegrityError as e:
                 print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                 pass
 
-
+        total_tracks_playlist = playlist_return[1][i]["total"]
 
         playlist_tracks = api._get(playlist_return[1][i]["href"])
-        if len(playlist_tracks) > 50:
+
+        if n_inserted_tracks[0] == 100 or n_inserted_tracks[0] == total_tracks_playlist:
             continue
 
         for playlist_track in playlist_tracks["items"]:
