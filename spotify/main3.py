@@ -92,7 +92,7 @@ def track_loop(id_track, keyword):
                             (id_track, keyword))
         except pymysql.err.IntegrityError as e:
             print(e)
-            print("Erro: não foi possivel dar adicionar a tag em track")
+            print("Erro: não foi possivel dar adicionar a tag em track\n")
             pass
 
     if flag == 1:
@@ -327,7 +327,7 @@ def main():
     with conn.cursor() as cursor:
         cursor.execute("SET autocommit=1")
 
-    keywords = ["sixties", "seventies", "eighties", "nineties"]
+    keywords = ["seventies", "eighties", "nineties"]
     i = 0
     while i < len(keywords):
         with conn.cursor() as cursor:
