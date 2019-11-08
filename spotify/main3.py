@@ -233,7 +233,11 @@ def track_loop(id_track, keyword):
     '''
 
 def user_loop(user_id):
-    user = api.user(user_id)
+    try:
+        user = api.user(user_id)
+    except (spotipy.client.SpotifyException) as e:
+        print("\n\nUsuario {} troll\n\n".format(user_id))
+        return
 
     del user["external_urls"]
     del user["href"]
@@ -286,7 +290,7 @@ def playlist_find(result, keyword):
             try:
                 cursor.execute("SELECT count(*) FROM Playlist_Track WHERE id_playlist = %s", (playlist_return[0][i]))
                 n_inserted_tracks = cursor.fetchone()
-                
+
             except pymysql.err.IntegrityError as e:
                 print("Erro: não foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                 pass
@@ -294,8 +298,9 @@ def playlist_find(result, keyword):
         total_tracks_playlist = playlist_return[1][i]["total"]
 
         playlist_tracks = api._get(playlist_return[1][i]["href"])
+        # print(n_inserted_tracks[0], total_tracks_playlist, len(playlist_tracks["items"]), n_inserted_tracks[0]/len(playlist_tracks["items"]))
 
-        if n_inserted_tracks[0] == 100 or n_inserted_tracks[0] == total_tracks_playlist:
+        if n_inserted_tracks[0]/len(playlist_tracks["items"]) > 0.8 or n_inserted_tracks[0] == total_tracks_playlist:
             continue
 
         for playlist_track in playlist_tracks["items"]:
@@ -330,7 +335,7 @@ def main():
     with conn.cursor() as cursor:
         cursor.execute("SET autocommit=1")
 
-    keywords = ["seventies", "eighties", "nineties"]
+    keywords = ["eighties", "nineties", "60s", "70s", "80s", "90s", "00s", "10s", "60's", "70's", "80's", "90's", "00's", "10's"]
     i = 0
     while i < len(keywords):
         with conn.cursor() as cursor:
@@ -357,7 +362,7 @@ def main():
             errorPrint(e)
             print("Restantando o programa\n ")
             continue
-        except (spotipy.client.SpotifyException) as e:
+        except (spotipy.client.SpotifyException, spotipy.oauth2.SpotifyOauthError) as e:
             errorPrint(e)
             print("Restantando o programa e a conexao do spotify\n")
             api = api_setup()
