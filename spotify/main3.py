@@ -94,18 +94,25 @@ def track_loop(id_track, keyword):
             if select_track_id:
                 flag = 1
         except (pymysql.err.IntegrityError, pymysql.err.ProgrammingError) as e:
-            print("Erro: não foi possivel dar SELECT em Track\n{}\n".format(e))
+            logger.critical("Nao foi possivel dar SELECT em Track\n{}\n".format(e))
             return 0
-
 
     with conn.cursor() as cursor:
         try:
-            cursor.execute("INSERT INTO Track_Tag (id_track, tag_name) VALUES (%s, %s)",
-                            (id_track, keyword))
+            cursor.execute("SELECT * FROM Track_Tag WHERE id_track='{}' and tag_name='{}'".format(id_track, keyword))
+            track_tag_select = cursor.fetchone()
         except pymysql.err.IntegrityError as e:
-            print(e)
-            print("Erro: não foi possivel dar adicionar a tag em track\n")
+            logger.critical("NNao foi possivel dar SELECT em Track_Tag\n{}".format(e))
             pass
+
+    if True:
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute("INSERT INTO Track_Tag (id_track, tag_name) VALUES (%s, %s)",
+                                (id_track, keyword))
+            except pymysql.err.IntegrityError as e:
+                logger.error("Nao foi possivel dar adicionar a tag em track\n{}\n".format(e))
+                pass
 
     if flag == 1:
         return 0
@@ -311,7 +318,7 @@ def playlist_loop(result):
                 except pymysql.err.IntegrityError as e:
                     logger.error("Nao foi possivel dar adicionar a playlist '{}'\n{}\n".format(pl["name"], e))
                     pass
-
+    
     return (return_playlist_id, return_tracks)
 
 
@@ -353,9 +360,8 @@ def playlist_find(result, keyword):
                     pl_t_select = cursor.fetchone()
                 except pymysql.err.IntegrityError as e:
                     logger.critical("Nao foi possivel dar adicionar a track na playlist\n{}\n".format(e))
-                    sys.exit()
 
-            if True:
+            if pl_t_select is None:
                 with conn.cursor() as cursor:
                     try:
                         cursor.execute("INSERT INTO Playlist_Track (id_playlist, id_track) VALUES (%s, %s)",
