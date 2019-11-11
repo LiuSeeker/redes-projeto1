@@ -113,7 +113,7 @@ def track_loop(id_track, keyword):
             except pymysql.err.IntegrityError as e:
                 logger.error("Nao foi possivel dar adicionar a tag em track\n{}\n".format(e))
                 pass
-
+    sys.exit()
     if flag == 1:
         return 0
 
@@ -369,7 +369,6 @@ def playlist_find(result, keyword):
                     except pymysql.err.IntegrityError as e:
                         logger.error("Nao foi possivel dar adicionar a track na playlist\n{}\n".format(e))
                         pass
-                sys.exit()
 
     if result["playlists"]["next"] is None:
 	    return
@@ -389,7 +388,7 @@ def main():
     with conn.cursor() as cursor:
         cursor.execute("SET autocommit=1")
 
-    keywords = ["eighties", "nineties", "60s", "70s", "80s", "90s", "00s", "10s", "60's", "70's", "80's", "90's", "00's", "10's"]
+    keywords = ["teste", "eighties", "nineties", "60s", "70s", "80s", "90s", "00s", "10s", "60's", "70's", "80's", "90's", "00's", "10's"]
     i = 0
     while i < len(keywords):
         with conn.cursor() as cursor:
