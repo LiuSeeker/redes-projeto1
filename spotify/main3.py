@@ -245,6 +245,7 @@ def track_loop(id_track, keyword):
     '''
 
 def user_loop(user_id):
+    print("user_loop")
     try:
         user = api.user(user_id)
     except (spotipy.client.SpotifyException) as e:
@@ -281,6 +282,7 @@ def user_loop(user_id):
     return
 
 def playlist_loop(result):
+    print("playlist_loop")
 
     return_tracks = []
     return_playlist_id = []
@@ -314,6 +316,7 @@ def playlist_loop(result):
 
 
 def playlist_find(result, keyword):
+    print("playlist_find")
     if result is None:
         return
     playlist_return = playlist_loop(result)
