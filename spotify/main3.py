@@ -32,14 +32,18 @@ def genre_insert(genre_list):
 
 
 def artist_loop(artist_list):
-    api = api_setup()
     artists_id = []
 
     for artist_info in artist_list:
         artist_id = artist_info["id"]
+
         artists_id.append(artist_id)
 
-        artist = api.artist(artist_id)
+        try:
+            artist = api.artist(artist_id)
+        except json.decoder.JSONDecodeError as e:
+            pprint(artist_id)
+            sys.exit()
 
         del artist["external_urls"]
         artist["followers"] = artist["followers"]["total"]
@@ -299,6 +303,8 @@ def playlist_find(result, keyword):
 
         playlist_tracks = api._get(playlist_return[1][i]["href"])
         # print(n_inserted_tracks[0], total_tracks_playlist, len(playlist_tracks["items"]), n_inserted_tracks[0]/len(playlist_tracks["items"]))
+        if len(playlist_tracks["items"]) == 0:
+            return
 
         if n_inserted_tracks[0]/len(playlist_tracks["items"]) > 0.8 or n_inserted_tracks[0] == total_tracks_playlist:
             continue
