@@ -468,13 +468,13 @@ def main():
             playlist_find(result, keywords[i])
             i += 1
         except (OSError, requests.exceptions.ConnectionError, urllib3.exceptions.ProtocolError) as e:
-            logger.fatal("!! {}".format(e)))
+            logger.fatal("!! {}".format(e))
             errorPrint(e)
             print("Restantando o programa e a conexao do spotify\n")
             api = api_setup()
             continue
         except pymysql.err.OperationalError as e:
-            logger.fatal("!! {}".format(e)))
+            logger.fatal("!! {}".format(e))
             errorPrint(e)
             print("Restantando o programa e a conexao do mysql\n")
             conn = mysql_setup()
@@ -485,7 +485,7 @@ def main():
         #    print("Restantando o programa\n ")
         #    continue
         except (spotipy.client.SpotifyException, spotipy.oauth2.SpotifyOauthError) as e:
-            logger.fatal("!! {}".format(e)))
+            logger.fatal("!! {}".format(e))
             errorPrint(e)
             print("Restantando o programa e a conexao do spotify\n")
             api = api_setup()
