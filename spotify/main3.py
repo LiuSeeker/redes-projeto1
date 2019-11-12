@@ -403,6 +403,7 @@ def playlist_find(result, keyword):
             continue
 
         for playlist_track in playlist_tracks["items"]:
+            print(playlist_track)
             if playlist_track["track"]:
                 track_loop(playlist_track["track"]["id"], keyword)
             else:
