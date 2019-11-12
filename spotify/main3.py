@@ -317,7 +317,7 @@ def user_loop(user_id):
         user = api.user(user_id)
     except (spotipy.client.SpotifyException) as e:
         logger.error("Usuario {} inexistente\n{}".format(user_id, e))
-        return
+        return -1
 
     with conn.cursor() as cursor:
         try:
@@ -327,7 +327,7 @@ def user_loop(user_id):
             logger.critical("Nao foi possivel dar select em usuario '{}'\n{}".format(user["display_name"], e))
         
     if user_select is not None:
-        return
+        return 1
 
     del user["external_urls"]
     del user["href"]
@@ -345,7 +345,7 @@ def user_loop(user_id):
             logger.error("Nao foi possivel dar adicionar o usuario '{}'\n{}".format(user["display_name"], e))
             pass
 
-    return
+    return 1
 
 def playlist_loop(result):
 
@@ -354,7 +354,10 @@ def playlist_loop(result):
 
     for pl in result["playlists"]["items"]:
         #pprint(pl)
-        user_loop(pl["owner"]["id"])
+        user_return = user_loop(pl["owner"]["id"])
+        if user_return != 1:
+            continue
+
         return_tracks.append(pl["tracks"])
         return_playlist_id.append(pl["id"])
 
@@ -465,11 +468,13 @@ def main():
             playlist_find(result, keywords[i])
             i += 1
         except (OSError, requests.exceptions.ConnectionError, urllib3.exceptions.ProtocolError) as e:
+            logger.fatal("!! {}".format(e)))
             errorPrint(e)
             print("Restantando o programa e a conexao do spotify\n")
             api = api_setup()
             continue
         except pymysql.err.OperationalError as e:
+            logger.fatal("!! {}".format(e)))
             errorPrint(e)
             print("Restantando o programa e a conexao do mysql\n")
             conn = mysql_setup()
@@ -480,6 +485,7 @@ def main():
         #    print("Restantando o programa\n ")
         #    continue
         except (spotipy.client.SpotifyException, spotipy.oauth2.SpotifyOauthError) as e:
+            logger.fatal("!! {}".format(e)))
             errorPrint(e)
             print("Restantando o programa e a conexao do spotify\n")
             api = api_setup()
