@@ -321,7 +321,7 @@ def user_loop(user_id):
 
     with conn.cursor() as cursor:
         try:
-            cursor.execute("SELECT * FROM Usuario WHERE id_user= (SELECT CONVERT ('{}' USING latin1_swedish_ci))".format(user["id"]))
+            cursor.execute("SELECT * FROM Usuario WHERE id_user= (SELECT CONVERT ('{}' USING latin1))".format(user["id"]))
             user_select = cursor.fetchone()
         except pymysql.err.IntegrityError as e:
             logger.critical("Nao foi possivel dar select em usuario '{}'\n{}".format(user["display_name"], e))
