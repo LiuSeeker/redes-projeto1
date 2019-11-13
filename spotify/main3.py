@@ -33,7 +33,7 @@ def genre_insert(genre_list):
     for genre in genre_list:
         with conn.cursor() as cursor:
             try:
-                cursor.execute("SELECT * FROM Genre WHERE genre_name = %s COLLATE = latin1_swedish_ci", (genre))
+                cursor.execute("SELECT * FROM Genre WHERE genre_name = %s COLLATE latin1_swedish_ci", (genre))
                 genre_select = cursor.fetchone()
             except (pymysql.err.IntegrityError, pymysql.err.ProgrammingError) as e:
                 logger.critical("Nao foi possivel dar SELECT em Genre '{}'\n{}".format(genre, e))
@@ -58,7 +58,7 @@ def artist_loop(artist_list):
 
         with conn.cursor() as cursor:
             try:
-                cursor.execute("SELECT * FROM Artist WHERE id_artist = %s COLLATE = latin1_swedish_ci", (artist_id))
+                cursor.execute("SELECT * FROM Artist WHERE id_artist = %s COLLATE latin1_swedish_ci", (artist_id))
                 artist_select = cursor.fetchone()
             except (pymysql.err.IntegrityError, pymysql.err.ProgrammingError) as e:
                 logger.critical("Nao foi possivel dar SELECT em Artist '{}'\n{}".format(artist_id, e))
@@ -97,7 +97,7 @@ def artist_loop(artist_list):
         for genre in artist["genres"]:
             with conn.cursor() as cursor:
                 try:
-                    cursor.execute("SELECT * FROM Genre_Artist WHERE genre_name = %s AND id_artist = %s COLLATE = latin1_swedish_ci", (genre, artist_id))
+                    cursor.execute("SELECT * FROM Genre_Artist WHERE genre_name = %s AND id_artist = %s COLLATE latin1_swedish_ci", (genre, artist_id))
                     genre_artist_select = cursor.fetchone()
                 except (pymysql.err.IntegrityError, pymysql.err.ProgrammingError) as e:
                     logger.critical("Nao foi possivel dar SELECT em Genre_Artist '{}'-'{}'\n{}".format(genre, artist_id, e))
@@ -127,7 +127,7 @@ def track_loop(id_track, keyword):
     if flag:
         with conn.cursor() as cursor:
             try:
-                cursor.execute("SELECT * FROM Track_Tag WHERE id_track='{}' and tag_name='{}' COLLATE = latin1_swedish_ci".format(id_track, keyword))
+                cursor.execute("SELECT * FROM Track_Tag WHERE id_track='{}' and tag_name='{}' COLLATE latin1_swedish_ci".format(id_track, keyword))
                 track_tag_select = cursor.fetchone()
             except pymysql.err.IntegrityError as e:
                 logger.critical("Nao foi possivel dar SELECT em Track_Tag '{}'-'{}'\n{}".format(id_track, keyword, e))
@@ -214,7 +214,7 @@ def track_loop(id_track, keyword):
 
     with conn.cursor() as cursor:
         try:
-            cursor.execute("SELECT * FROM Track_Tag WHERE id_track='{}' and tag_name='{}' COLLATE = latin1_swedish_ci".format(id_track, keyword))
+            cursor.execute("SELECT * FROM Track_Tag WHERE id_track='{}' and tag_name='{}' COLLATE latin1_swedish_ci".format(id_track, keyword))
             track_tag_select = cursor.fetchone()
         except pymysql.err.IntegrityError as e:
             logger.critical("Nao foi possivel dar SELECT em Track_Tag '{}'-'{}'\n{}".format(id_track, keyword, e))
@@ -266,7 +266,7 @@ def track_loop(id_track, keyword):
 
     with conn.cursor() as cursor:
         try:
-            cursor.execute("SELECT * FROM Album WHERE id_album='{}' COLLATE = latin1_swedish_ci".format(id_album))
+            cursor.execute("SELECT * FROM Album WHERE id_album='{}' COLLATE latin1_swedish_ci".format(id_album))
             album_select = cursor.fetchone()
         except pymysql.err.IntegrityError as e:
             logger.critical("Nao foi possivel dar SELECT em Album '{}'\n{}".format(album_select, e))
@@ -284,7 +284,7 @@ def track_loop(id_track, keyword):
 
         with conn.cursor() as cursor:
             try:
-                cursor.execute("SELECT * FROM Album_Track WHERE id_album='{}' and id_track='{}' COLLATE = latin1_swedish_ci".format(id_album, id_track))
+                cursor.execute("SELECT * FROM Album_Track WHERE id_album='{}' and id_track='{}' COLLATE latin1_swedish_ci".format(id_album, id_track))
                 album_track_select = cursor.fetchone()
             except pymysql.err.IntegrityError as e:
                 logger.critical("Nao foi possivel dar SELECT em Album_Track '{}'-'{}'\n{}".format(id_album, id_track, e))
@@ -321,7 +321,7 @@ def user_loop(user_id):
 
     with conn.cursor() as cursor:
         try:
-            cursor.execute("SELECT * FROM Usuario WHERE id_user='{}' COLLATE = latin1_swedish_ci".format(user["id"]))
+            cursor.execute("SELECT * FROM Usuario WHERE id_user='{}' COLLATE latin1_swedish_ci".format(user["id"]))
             user_select = cursor.fetchone()
         except pymysql.err.IntegrityError as e:
             logger.critical("Nao foi possivel dar select em usuario '{}'\n{}".format(user["display_name"], e))
@@ -363,7 +363,7 @@ def playlist_loop(result):
 
         with conn.cursor() as cursor:
             try:
-                cursor.execute("SELECT * FROM Playlist WHERE id_playlist = '{}' COLLATE = latin1_swedish_ci".format(pl["id"]))
+                cursor.execute("SELECT * FROM Playlist WHERE id_playlist = '{}' COLLATE latin1_swedish_ci".format(pl["id"]))
                 playlist_select = cursor.fetchone()
             except pymysql.err.IntegrityError as e:
                 logger.critical("Nao foi possivel dar select em playlist '{}'\n{}".format(pl["name"], e))
@@ -390,7 +390,7 @@ def playlist_find(result, keyword):
     for i in range(len(playlist_return[0])):
         with conn.cursor() as cursor:
             try:
-                cursor.execute("SELECT count(*) FROM Playlist_Track WHERE id_playlist = %s COLLATE = latin1_swedish_ci", (playlist_return[0][i]))
+                cursor.execute("SELECT count(*) FROM Playlist_Track WHERE id_playlist = %s COLLATE latin1_swedish_ci", (playlist_return[0][i]))
                 n_inserted_tracks = cursor.fetchone()
             except pymysql.err.IntegrityError as e:
                 logger.critical("Nao foi possivel dar select em Playlist_Track '{}'\n{}".format(playlist_return[0][i], e))
@@ -413,7 +413,7 @@ def playlist_find(result, keyword):
             
             with conn.cursor() as cursor:
                 try:
-                    cursor.execute("SELECT * FROM Playlist_Track WHERE id_playlist = '{}' AND id_track = '{}' COLLATE = latin1_swedish_ci".format(playlist_return[0][i], playlist_track["track"]["id"]))
+                    cursor.execute("SELECT * FROM Playlist_Track WHERE id_playlist = '{}' AND id_track = '{}' COLLATE latin1_swedish_ci".format(playlist_return[0][i], playlist_track["track"]["id"]))
                     pl_t_select = cursor.fetchone()
                 except pymysql.err.IntegrityError as e:
                     logger.critical("Nao foi possivel dar adicionar a track na playlist '{}'-'{}'\n{}".format(playlist_return[0][i], playlist_track["track"]["id"], e))
@@ -450,7 +450,7 @@ def main():
     while i < len(keywords):
         with conn.cursor() as cursor:
             try:
-                cursor.execute("SELECT * FROM Tag WHERE tag_name = '{}' COLLATE = latin1_swedish_ci".format(keywords[i]))
+                cursor.execute("SELECT * FROM Tag WHERE tag_name = '{}' COLLATE latin1_swedish_ci".format(keywords[i]))
                 tag_select = cursor.fetchone()
             except pymysql.err.IntegrityError as e:
                 logger.critical("Nao foi dar select em tag\n{}\n".format(e))
