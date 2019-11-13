@@ -438,58 +438,62 @@ def errorPrint(error):
     print("! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !\n")
 
 def main():
-    logger.info("Script iniciado")
-    print("")
+    try:
+        logger.info("Script iniciado")
+        print("")
 
-    global api, conn
-    with conn.cursor() as cursor:
-        cursor.execute("SET autocommit=1")
-
-    keywords = ["eighties", "nineties", "60s", "70s", "80s", "90s", "00s", "10s", "60's", "70's", "80's", "90's", "00's", "10's"]
-    i = 0
-    while i < len(keywords):
+        global api, conn
         with conn.cursor() as cursor:
-            try:
-                cursor.execute("SELECT * FROM Tag WHERE tag_name = '{}'".format(keywords[i]))
-                tag_select = cursor.fetchone()
-            except pymysql.err.IntegrityError as e:
-                logger.critical("Nao foi dar select em tag\n{}\n".format(e))
+            cursor.execute("SET autocommit=1")
 
-            if tag_select is None:
+        keywords = ["eighties", "nineties", "60s", "70s", "80s", "90s", "00s", "10s", "60's", "70's", "80's", "90's", "00's", "10's"]
+        i = 0
+        while i < len(keywords):
+            with conn.cursor() as cursor:
                 try:
-                    cursor.execute("INSERT INTO Tag (tag_name) VALUES (%s)", (keywords[i]))
-                    print("Tag {} adicionado".format(keywords[i]))
+                    cursor.execute("SELECT * FROM Tag WHERE tag_name = '{}'".format(keywords[i]))
+                    tag_select = cursor.fetchone()
                 except pymysql.err.IntegrityError as e:
-                    logger.error("Nao foi possivel dar adicionar a tag {}\n{}\n".format(keywords[i], e))
-                    pass
+                    logger.critical("Nao foi dar select em tag\n{}\n".format(e))
 
-        try:
-            result = api.search(keywords[i], type="playlist", limit=50)
-            playlist_find(result, keywords[i])
-            i += 1
-        except (OSError, requests.exceptions.ConnectionError, urllib3.exceptions.ProtocolError) as e:
-            logger.fatal("!! {}".format(e))
-            errorPrint(e)
-            print("Restantando o programa e a conexao do spotify\n")
-            api = api_setup()
-            continue
-        except pymysql.err.OperationalError as e:
-            logger.fatal("!! {}".format(e))
-            errorPrint(e)
-            print("Restantando o programa e a conexao do mysql\n")
-            conn = mysql_setup()
-            continue
-        
-        #except TypeError as e:
-        #    errorPrint(e)
-        #    print("Restantando o programa\n ")
-        #    continue
-        except (spotipy.client.SpotifyException, spotipy.oauth2.SpotifyOauthError) as e:
-            logger.fatal("!! {}".format(e))
-            errorPrint(e)
-            print("Restantando o programa e a conexao do spotify\n")
-            api = api_setup()
-            continue
+                if tag_select is None:
+                    try:
+                        cursor.execute("INSERT INTO Tag (tag_name) VALUES (%s)", (keywords[i]))
+                        print("Tag {} adicionado".format(keywords[i]))
+                    except pymysql.err.IntegrityError as e:
+                        logger.error("Nao foi possivel dar adicionar a tag {}\n{}\n".format(keywords[i], e))
+                        pass
+
+            try:
+                result = api.search(keywords[i], type="playlist", limit=50)
+                playlist_find(result, keywords[i])
+                i += 1
+            except (OSError, requests.exceptions.ConnectionError, urllib3.exceptions.ProtocolError) as e:
+                logger.fatal("!! {}".format(e))
+                errorPrint(e)
+                print("Restantando o programa e a conexao do spotify\n")
+                api = api_setup()
+                continue
+            except pymysql.err.OperationalError as e:
+                logger.fatal("!! {}".format(e))
+                errorPrint(e)
+                print("Restantando o programa e a conexao do mysql\n")
+                conn = mysql_setup()
+                continue
+            
+            #except TypeError as e:
+            #    errorPrint(e)
+            #    print("Restantando o programa\n ")
+            #    continue
+            except (spotipy.client.SpotifyException, spotipy.oauth2.SpotifyOauthError) as e:
+                logger.fatal("!! {}".format(e))
+                errorPrint(e)
+                print("Restantando o programa e a conexao do spotify\n")
+                api = api_setup()
+                continue
+    finally:
+        logger.info("Script terminado")
+        logging.shutdown()
 
 if __name__ == '__main__':
     main()
