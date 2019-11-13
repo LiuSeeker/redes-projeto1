@@ -406,8 +406,9 @@ def playlist_find(result, keyword):
             continue
 
         for playlist_track in playlist_tracks["items"]:
-            if playlist_track["track"]["id"] is not None:
-                track_loop(playlist_track["track"]["id"], keyword)
+            if playlist_track is not None:
+                if playlist_track["track"]["id"] is not None:
+                    track_loop(playlist_track["track"]["id"], keyword)
             else:
                 continue
             
