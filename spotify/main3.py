@@ -1,4 +1,4 @@
-import datetime
+    import datetime
 import json
 import os
 import sys
@@ -42,7 +42,7 @@ def genre_insert(genre_list):
             with conn.cursor() as cursor:
                 try:
                     cursor.execute("INSERT INTO Genre (genre_name) VALUES (%s)", (genre))
-                    print("Genre {} adicionado".format(genre))
+                    print("Genre '{}' adicionado".format(genre))
                 except pymysql.err.IntegrityError as e:
                     logger.error("Nao foi possivel adicionar o gênero '{}'\n{}".format(genre, e))
                     pass
@@ -89,7 +89,7 @@ def artist_loop(artist_list):
             try:
                 cursor.execute("INSERT INTO Artist (id_artist, artist_name, popularity, followers) "
                 "VALUES (%s, %s, %s, %s)", (artist_id, name, popularity, followers))
-                print("Artist {} adicionado".format(artist_id))
+                print("Artist '{}' adicionado".format(artist_id))
             except pymysql.err.IntegrityError as e:
                 logger.error("Nao foi possivel adicionar o artista '{}'\n{}".format(name, e))
                 pass
@@ -106,14 +106,14 @@ def artist_loop(artist_list):
                     try:
                         cursor.execute("INSERT INTO Genre_Artist (genre_name, id_artist) "
                         "VALUES (%s, %s)", (genre, artist_id))
-                        print("Genre_Artist {}-{} adicionado".format(genre, artist_id))
+                        print("Genre_Artist '{}'-'{}' adicionado".format(genre, artist_id))
                     except pymysql.err.IntegrityError as e:
                         logger.error("Nao foi possivel adicionar o genero do artista '{}'-'{}'\n{}".format(genre, artist_id, e))
 
     return artists_id
 
 
-def track_loop(id_track, keyword):
+def track_loop(id_track, keyword, id_playlist):
     flag = 0
     with conn.cursor() as cursor:
         try:
@@ -137,7 +137,7 @@ def track_loop(id_track, keyword):
                 try:
                     cursor.execute("INSERT INTO Track_Tag (id_track, tag_name) VALUES (%s, %s)",
                                     (id_track, keyword))
-                    print("Track_Tag {}-{} adicionado".format(id_track, keyword))
+                    print("Track_Tag '{}'-'{}' adicionado".format(id_track, keyword))
                 except pymysql.err.IntegrityError as e:
                     logger.error("Nao foi possivel dar adicionar a tag em track '{}'-'{}'\n{}".format(id_track, keyword, e))
                     pass
@@ -206,7 +206,7 @@ def track_loop(id_track, keyword):
                             (id_track, track_name, duration_ms, popularity, explicit, danceability, \
                             energy, key_note, loudness, mode, speechiness, acousticness, instrumentalness, \
                             liveness, valence, tempo, time_signature))
-            print("Track {} adicionado".format(track_name))
+            print("Track '{}' adicionado".format(track_name))
         except pymysql.err.IntegrityError as e:
             logger.error("Nao foi possivel dar adicionar a track '{}'\n{}".format(track_name, e))
             pass
@@ -222,9 +222,9 @@ def track_loop(id_track, keyword):
     if track_tag_select is None:
         with conn.cursor() as cursor:
             try:
-                cursor.execute("INSERT INTO Track_Tag (id_track, tag_name) VALUES (%s, %s)",
-                                (id_track, keyword))
-                print("Track_Tag {}-{} adicionado".format(id_track, keyword))
+                cursor.execute("INSERT INTO Track_Tag (id_track, tag_name, id_playlist) VALUES (%s, %s)",
+                                (id_track, keyword, id_playlist))
+                print("Track_Tag '{}'-'{}'-'{}' adicionado".format(id_track, keyword, id_playlist))
             except pymysql.err.IntegrityError as e:
                 logger.error("Nao foi possivel dar adicionar a tag em track '{}'-'{}'\n{}".format(id_track, keyword, e))
                 pass
@@ -237,7 +237,7 @@ def track_loop(id_track, keyword):
             try:
                 cursor.execute("INSERT INTO Artist_Track (id_artist, id_track) VALUES (%s, %s)",
                                 (artist_id, id_track))
-                print("Artist_Track {}-{} adicionado".format(artist_id, id_track))
+                print("Artist_Track '{}'-'{}' adicionado".format(artist_id, id_track))
             except pymysql.err.IntegrityError as e:
                 logger.error("Nao foi possivel dar adicionar a track do artista '{}'-'{}'\n{}".format(artist_id, id_track, e))
                 pass
@@ -277,7 +277,7 @@ def track_loop(id_track, keyword):
                 cursor.execute("INSERT INTO Album (id_album, album_name, release_date, popularity, ntracks) "
                                 "VALUES (%s, %s, STR_TO_DATE(%s, '%%Y-%%m-%%d'), %s, %s)",
                                 (id_album, album_name, album_release_date, album_popularity, album_ntracks))
-                print("Album {} adicionado".format(album_name))
+                print("Album '{}' adicionado".format(album_name))
             except pymysql.err.IntegrityError as e:
                 logger.error("Nao foi possivel dar adicionar o album '{}'\n{}".format(album_name, e))
                 pass
@@ -294,7 +294,7 @@ def track_loop(id_track, keyword):
                 try:
                     cursor.execute("INSERT INTO Album_Track (id_album, id_track) VALUES (%s, %s)",
                                     (id_album, id_track))
-                    print("Album_Track {}-{} adicionado".format(id_album, id_track))
+                    print("Album_Track '{}'-'{}' adicionado".format(id_album, id_track))
                 except pymysql.err.IntegrityError as e:
                     logger.error("Nao foi possivel dar adicionar a track em album '{}'-'{}'\n{}".format(id_album, id_track, e))
                     pass
@@ -316,7 +316,7 @@ def user_loop(user_id):
     try:
         user = api.user(user_id)
     except (spotipy.client.SpotifyException) as e:
-        logger.error("Usuario {} inexistente\n{}".format(user_id, e))
+        logger.error("Usuario '{}' inexistente\n{}".format(user_id, e))
         return -1
 
     with conn.cursor() as cursor:
@@ -340,7 +340,7 @@ def user_loop(user_id):
         try:
             cursor.execute("INSERT INTO Usuario (id_user, display_name, followers) VALUES (%s, %s, %s)",
                             (user["id"], user["display_name"], user["followers"]))
-            print("Usuario {} adicionado".format(user["id"]))
+            print("Usuario '{}' adicionado".format(user["id"]))
         except pymysql.err.IntegrityError as e:
             logger.error("Nao foi possivel dar adicionar o usuario '{}'\n{}".format(user["display_name"], e))
             pass
@@ -375,6 +375,7 @@ def playlist_loop(result):
                                     "VALUES (%s, %s, %s, %s, %s)",
                                     (pl["id"], pl["name"], pl["owner"]["id"], 
                                     pl["collaborative"], 1))
+                    print("Playlist '{}' adicionada".format(pl["id"]))
                 except pymysql.err.IntegrityError as e:
                     logger.error("Nao foi possivel dar adicionar a playlist '{}'\n{}".format(pl["name"], e))
                     pass
@@ -402,14 +403,14 @@ def playlist_find(result, keyword):
         if len(playlist_tracks["items"]) == 0:
             return
 
-        #if n_inserted_tracks[0]/len(playlist_tracks["items"]) > 0.8 or n_inserted_tracks[0] == total_tracks_playlist:
-        #    continue
+        if n_inserted_tracks[0]/len(playlist_tracks["items"]) > 0.8 or n_inserted_tracks[0] == total_tracks_playlist:
+            continue
 
         for playlist_track in playlist_tracks["items"]:
             if playlist_track is not None:
                 if playlist_track["track"] is not None:
                     if playlist_track["track"]["id"] is not None:
-                        track_loop(playlist_track["track"]["id"], keyword)
+                        track_loop(playlist_track["track"]["id"], keyword, playlist_return[0][i])
                     else:
                         continue
                 else:
@@ -429,6 +430,7 @@ def playlist_find(result, keyword):
                     try:
                         cursor.execute("INSERT INTO Playlist_Track (id_playlist, id_track) VALUES (%s, %s)",
                                         (playlist_return[0][i], playlist_track["track"]["id"]))
+                        print("Album_Track '{}'-'{}' adicionado".format(playlist_return[0][i], playlist_track["track"]["id"]))
                     except pymysql.err.IntegrityError as e:
                         logger.error("Nao foi possivel dar adicionar a track na playlist '{}'-'{}'\n{}".format(playlist_return[0][i], playlist_track["track"]["id"], e))
                         pass
@@ -465,7 +467,7 @@ def main():
                 if tag_select is None:
                     try:
                         cursor.execute("INSERT INTO Tag (tag_name) VALUES (%s)", (keywords[i]))
-                        print("Tag {} adicionado".format(keywords[i]))
+                        print("Tag '{}' adicionado".format(keywords[i]))
                     except pymysql.err.IntegrityError as e:
                         logger.error("Nao foi possivel dar adicionar a tag {}\n{}\n".format(keywords[i], e))
                         pass
