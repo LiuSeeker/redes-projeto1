@@ -1,4 +1,4 @@
-    import datetime
+import datetime
 import json
 import os
 import sys
@@ -114,6 +114,7 @@ def artist_loop(artist_list):
 
 
 def track_loop(id_track, keyword, id_playlist):
+    print(id_playlist, type(id_playlist))
     flag = 0
     with conn.cursor() as cursor:
         try:
@@ -127,19 +128,19 @@ def track_loop(id_track, keyword, id_playlist):
     if flag:
         with conn.cursor() as cursor:
             try:
-                cursor.execute("SELECT * FROM Track_Tag WHERE id_track='{}' and tag_name='{}'".format(id_track, keyword))
+                cursor.execute("SELECT * FROM Track_Tag WHERE id_track='{}' and tag_name='{}' and id_playlist='{}'".format(id_track, keyword, id_playlist))
                 track_tag_select = cursor.fetchone()
             except pymysql.err.IntegrityError as e:
-                logger.critical("Nao foi possivel dar SELECT em Track_Tag '{}'-'{}'\n{}".format(id_track, keyword, e))
+                logger.critical("Nao foi possivel dar SELECT em Track_Tag '{}'-'{}'-'{}'\n{}".format(id_track, keyword, id_playlist, e))
 
         if track_tag_select is None:
             with conn.cursor() as cursor:
                 try:
-                    cursor.execute("INSERT INTO Track_Tag (id_track, tag_name) VALUES (%s, %s)",
-                                    (id_track, keyword))
-                    print("Track_Tag '{}'-'{}' adicionado".format(id_track, keyword))
+                    cursor.execute("INSERT INTO Track_Tag (id_track, tag_name, id_playlist) VALUES (%s, %s, %s)",
+                                    (id_track, keyword, id_playlist))
+                    print("Track_Tag '{}'-'{}'-'{}' adicionado".format(id_track, keyword, id_playlist))
                 except pymysql.err.IntegrityError as e:
-                    logger.error("Nao foi possivel dar adicionar a tag em track '{}'-'{}'\n{}".format(id_track, keyword, e))
+                    logger.error("Nao foi possivel dar adicionar a tag em track '{}'-'{}'-'{}'\n{}".format(id_track, keyword, id_playlist, e))
                     pass
 
         return 0
@@ -214,19 +215,19 @@ def track_loop(id_track, keyword, id_playlist):
 
     with conn.cursor() as cursor:
         try:
-            cursor.execute("SELECT * FROM Track_Tag WHERE id_track='{}' and tag_name='{}'".format(id_track, keyword))
+            cursor.execute("SELECT * FROM Track_Tag WHERE id_track='{}' and tag_name='{}' and id_playlist='{}'".format(id_track, keyword, id_playlist))
             track_tag_select = cursor.fetchone()
         except pymysql.err.IntegrityError as e:
-            logger.critical("Nao foi possivel dar SELECT em Track_Tag '{}'-'{}'\n{}".format(id_track, keyword, e))
+            logger.critical("Nao foi possivel dar SELECT em Track_Tag '{}'-'{}'-'{}'\n{}".format(id_track, keyword, id_playlist, e))
 
     if track_tag_select is None:
         with conn.cursor() as cursor:
             try:
-                cursor.execute("INSERT INTO Track_Tag (id_track, tag_name, id_playlist) VALUES (%s, %s)",
+                cursor.execute("INSERT INTO Track_Tag (id_track, tag_name, id_playlist) VALUES (%s, %s, %s)",
                                 (id_track, keyword, id_playlist))
                 print("Track_Tag '{}'-'{}'-'{}' adicionado".format(id_track, keyword, id_playlist))
             except pymysql.err.IntegrityError as e:
-                logger.error("Nao foi possivel dar adicionar a tag em track '{}'-'{}'\n{}".format(id_track, keyword, e))
+                logger.error("Nao foi possivel dar adicionar a tag em track '{}'-'{}'-'{}'\n{}".format(id_track, keyword, id_playlist, e))
                 pass
     
     
