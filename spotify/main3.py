@@ -402,8 +402,8 @@ def playlist_find(result, keyword):
         if len(playlist_tracks["items"]) == 0:
             return
 
-        if n_inserted_tracks[0]/len(playlist_tracks["items"]) > 0.8 or n_inserted_tracks[0] == total_tracks_playlist:
-            continue
+        #if n_inserted_tracks[0]/len(playlist_tracks["items"]) > 0.8 or n_inserted_tracks[0] == total_tracks_playlist:
+        #    continue
 
         for playlist_track in playlist_tracks["items"]:
             if playlist_track is not None:
